@@ -8,9 +8,13 @@
 import SwiftUI
 
 struct HomeView: View {
-    @ObservedObject var taskViewModel:TaskViewModel = TaskViewModel()
+    @StateObject var taskViewModel:TaskViewModel = TaskViewModel()
     @State private var pickerFilter = ["Active","Closed"]
     @State private var defaultPickerFilter = "Active"
+    @State private var showAddTaskView :Bool = false
+    @State private var showTaskDetailView :Bool = false
+    @State private var selectedTask :Task = Task(id: 0, name: "", description: "", isCompleted: false, finishDate: Date())
+
     var body: some View {
         NavigationStack{
             Picker("Picker Filter", selection: $defaultPickerFilter){
@@ -33,6 +37,9 @@ struct HomeView: View {
                     }
                     .font(.subheadline)
                     
+                }.onTapGesture{
+                    selectedTask = task
+                    showTaskDetailView.toggle()
                 }
                 
             }.onAppear{
@@ -40,6 +47,21 @@ struct HomeView: View {
             }
             .listStyle(.plain)
             .navigationTitle("Home")
+            .toolbar{
+                ToolbarItem(placement: .topBarTrailing){
+                    Button{
+                        showAddTaskView = true
+                    }label:{
+                        Image(systemName: "plus")
+                    }
+                }
+            }
+            .sheet(isPresented: $showAddTaskView){
+                AddTaskView(taskViewModel: taskViewModel, showAddTaskView: $showAddTaskView)
+            }
+            .sheet(isPresented: $showTaskDetailView){
+                TaskDetailView(taskViewModel: taskViewModel, selectedTask: $selectedTask, showTaskDetailView: $showTaskDetailView)
+            }
         }
     }
 }

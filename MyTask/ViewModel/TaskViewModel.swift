@@ -12,6 +12,6 @@ final class TaskViewModel :ObservableObject{
     @Published var tasks : [Task] = []
     
     func getTask(isActive:Bool){
-        tasks = Task.createMockTask().filter({$0.isActive == isActive})
+        tasks = Task.createMockTask().filter({$0.isCompleted == !isActive})
     }
 }
