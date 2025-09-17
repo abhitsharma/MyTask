@@ -12,6 +12,7 @@ struct TaskDetailView: View {
     @Binding var selectedTask:Task
     @Binding var showTaskDetailView:Bool
     @Binding  var refreshTaskList:Bool
+    @State  var showDeleteAlert:Bool = false
     var body: some View {
         NavigationStack{
             List{
@@ -26,18 +27,30 @@ struct TaskDetailView: View {
                 }
                 Section(){
                     Button{
-                        if taskViewModel.deleteTask(task: selectedTask){
-                            showTaskDetailView.toggle()
-                            refreshTaskList.toggle()
-                        }
+                        showDeleteAlert.toggle()
                     }label:{
                         Text("Delete")
                             .fontWeight(.bold)
                             .foregroundStyle(.red)
                             .frame(maxWidth: .infinity,alignment: .center)
                             
+                    }.alert("Delete Task?", isPresented: $showDeleteAlert){
+                        Button{
+                            showTaskDetailView.toggle()
+                        }label: {
+                            Text("no")
+                        }
+                        Button(role: .destructive){
+                            if taskViewModel.deleteTask(task: selectedTask){
+                                showTaskDetailView.toggle()
+                                refreshTaskList.toggle()
+                            }
+                        }label: {
+                            Text("Delete")
+                        }
+                    }message: {
+                        Text("Do you want to delete this task ")
                     }
-                    
                 }
                 
             }
@@ -58,7 +71,7 @@ struct TaskDetailView: View {
                         }
                     }label: {
                         Text("Update")
-                    }
+                    }.disabled(selectedTask.name.isEmpty)
                 }
             }
         }
