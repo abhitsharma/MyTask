@@ -14,7 +14,7 @@ struct HomeView: View {
     @State private var showAddTaskView :Bool = false
     @State private var showTaskDetailView :Bool = false
     @State private var selectedTask :Task = Task(id: 0, name: "", description: "", isCompleted: false, finishDate: Date())
-
+    @State private var refreshTaskList:Bool = false
     var body: some View {
         NavigationStack{
             Picker("Picker Filter", selection: $defaultPickerFilter){
@@ -40,6 +40,8 @@ struct HomeView: View {
                 }.onTapGesture{
                     selectedTask = task
                     showTaskDetailView.toggle()
+                }.onChange(of:refreshTaskList){
+                    taskViewModel.getTask(isActive: defaultPickerFilter == "Active")
                 }
                 
             }.onAppear{
@@ -57,10 +59,10 @@ struct HomeView: View {
                 }
             }
             .sheet(isPresented: $showAddTaskView){
-                AddTaskView(taskViewModel: taskViewModel, showAddTaskView: $showAddTaskView)
+                AddTaskView(taskViewModel: taskViewModel, showAddTaskView: $showAddTaskView, refreshTaskList: $refreshTaskList)
             }
             .sheet(isPresented: $showTaskDetailView){
-                TaskDetailView(taskViewModel: taskViewModel, selectedTask: $selectedTask, showTaskDetailView: $showTaskDetailView)
+                TaskDetailView(taskViewModel: taskViewModel, selectedTask: $selectedTask, showTaskDetailView: $showTaskDetailView, refreshTaskList: $refreshTaskList)
             }
         }
     }
